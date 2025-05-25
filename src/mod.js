@@ -72,7 +72,7 @@ class ConsumablesGalore {
                     traverse(filePath);
                 }
                 else if (path.extname(filePath).toLowerCase() === '.json') {
-                    console.log(`[${modShortName}] Processing file:`, filePath);
+                    //console.log(`[${modShortName}] Processing file:`, filePath);
                     const fileContent = fs.readFileSync(filePath, 'utf-8');
                     try {
                         const consumableFile = JSON.parse(fileContent);
@@ -131,7 +131,7 @@ class ConsumablesGalore {
                                 for (const nextCondition of questContent.conditions.AvailableForFinish) {
                                     let nextConditionData = nextCondition;
                                     if ((nextConditionData.conditionType == "HandoverItem" || nextConditionData.conditionType == "FindItem") && nextConditionData.target.includes(originalConsumable)) {
-                                        logger.info(`[${modShortName}] found ${originalConsumable} as find/handover item in quest ${questContent._id} aka ${questContent.QuestName}, adding ${newConsumableId} to it`);
+                                        //logger.info(`[${modShortName}] found ${originalConsumable} as find/handover item in quest ${questContent._id} aka ${questContent.QuestName}, adding ${newConsumableId} to it`);
                                         nextConditionData.target.push(newConsumableId);
                                     }
                                 }
