@@ -54,6 +54,9 @@ class ConsumablesGalore {
         const db = container.resolve("DatabaseServer");
         //Custom item server to create new items.
         const customItem = container.resolve("CustomItemService");
+        const config = JSON.parse(fs.readFileSync(path.join(modPath, "config/config.json"), "utf-8"));
+        const debugMode = config.debug;
+        const realDebugMode = config.realdebug;
         function compareVersions(a, b) {
             const parse = (v) => v.split(".").map(num => parseInt(num));
             const [a1, a2, a3] = parse(a);
@@ -128,7 +131,8 @@ class ConsumablesGalore {
                     traverse(filePath);
                 }
                 else if (path.extname(filePath).toLowerCase() === '.json') {
-                    //console.log(`[${modShortName}] Processing file:`, filePath);
+                    if (debugMode)
+                        console.log(`[${modShortName}] Processing file:`, filePath);
                     const fileContent = fs.readFileSync(filePath, 'utf-8');
                     try {
                         const consumableFile = JSON.parse(fileContent);
@@ -187,7 +191,8 @@ class ConsumablesGalore {
                                 for (const nextCondition of questContent.conditions.AvailableForFinish) {
                                     let nextConditionData = nextCondition;
                                     if ((nextConditionData.conditionType == "HandoverItem" || nextConditionData.conditionType == "FindItem") && nextConditionData.target.includes(originalConsumable)) {
-                                        //logger.info(`[${modShortName}] found ${originalConsumable} as find/handover item in quest ${questContent._id} aka ${questContent.QuestName}, adding ${newConsumableId} to it`);
+                                        if (debugMode)
+                                            logger.info(`[${modShortName}] found ${originalConsumable} as find/handover item in quest ${questContent._id} aka ${questContent.QuestName}, adding ${newConsumableId} to it`);
                                         nextConditionData.target.push(newConsumableId);
                                     }
                                 }
@@ -231,13 +236,15 @@ class ConsumablesGalore {
                                             if (originIndex !== -1) {
                                                 const originProbability = staticLoot[container].itemDistribution[originIndex].relativeProbability;
                                                 const spawnRelativeProbability = Math.max(Math.round(originProbability * consumableFile.spawnWeightComparedToOrigin), 1);
-                                                //logger.warning(`[${modShortName}] didn't find existing entry for ${newConsumableId} in container ${container} items distribution`);
+                                                if (realDebugMode)
+                                                    logger.warning(`[${modShortName}] didn't find existing entry for ${newConsumableId} in container ${container} items distribution`);
                                                 staticLoot[container].itemDistribution.push({
                                                     tpl: newConsumableId,
                                                     relativeProbability: spawnRelativeProbability
                                                 });
-                                                //const lastElement = staticLoot[container].itemDistribution[staticLoot[container].itemDistribution.length - 1];
-                                                //logger.warning(`[${modShortName}] pushed element: ${JSON.stringify(lastElement)}`);
+                                                const lastElement = staticLoot[container].itemDistribution[staticLoot[container].itemDistribution.length - 1];
+                                                if (realDebugMode)
+                                                    logger.warning(`[${modShortName}] pushed element: ${JSON.stringify(lastElement)}`);
                                             }
                                         }
                                     }
