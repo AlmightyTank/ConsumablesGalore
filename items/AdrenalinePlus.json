@@ -3,7 +3,7 @@
 	"id": "63cfc6eabf3a8c2f87458f4d",
 	"fleaPrice": 3,
 	"handBookPrice": 3,
-	"includeInSameQuestsAsOrigin": true,
+	"includeInSameQuestsAsOrigin": false,
 	"addSpawnsInSamePlacesAsOrigin": true,
 	"spawnWeightComparedToOrigin": 1,
 	"MaxResource": 2,

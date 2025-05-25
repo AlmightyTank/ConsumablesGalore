@@ -3,7 +3,7 @@
 	"id": "6832962c2b1458c4ea86f8ec",
 	"fleaPrice": 98000,
 	"handBookPrice": 98000,
-	"includeInSameQuestsAsOrigin": true,
+	"includeInSameQuestsAsOrigin": false,
 	"addSpawnsInSamePlacesAsOrigin": true,
 	"spawnWeightComparedToOrigin": 0.5,
 	"MaxResource": 1,
@@ -57,7 +57,7 @@
 			"SkillName": "Strength",
 			"Value": 20
 		},
-    {
+    	{
 			"AbsoluteValue": true,
 			"BuffType": "HandsTremor",
 			"Chance": 0.2,
