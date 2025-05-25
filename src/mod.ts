@@ -39,6 +39,16 @@ class ConsumablesGalore implements IPostDBLoadMod
 		//Custom item server to create new items.
 		const customItem = container.resolve<CustomItemService>( "CustomItemService" );
 
+		function compareVersions(a: string, b: string): number {
+			const parse = (v: string) => v.split(".").map(num => parseInt(num));
+			const [a1, a2, a3] = parse(a);
+			const [b1, b2, b3] = parse(b);
+
+			if (a1 !== b1) return a1 - b1;
+			if (a2 !== b2) return a2 - b2;
+			return a3 - b3;
+		}
+
 		// Check GitHub for latest release
 		function checkForUpdates(localVersion: string, logger: Ilogger): void {
 			const options = {
@@ -65,8 +75,12 @@ class ConsumablesGalore implements IPostDBLoadMod
 					const tag = release.tag_name;
 					const latestVersion = tag.includes("-") ? tag.split("-").pop() : tag.replace(/^v/, "");
 
-					if (latestVersion !== localVersion) {
+					const comparison = compareVersions(localVersion, latestVersion);
+
+					if (comparison < 0) {
 						logger.warning(`[Consumables Galore] New version available: v${latestVersion}. You're using v${localVersion}. Visit: ${release.html_url}`);
+					} else if (comparison > 0) {
+						logger.info(`[Consumables Galore] You are using a newer version (v${localVersion}) than the latest release (v${latestVersion}). Updating the mod?`);
 					} else {
 						logger.info(`[Consumables Galore] You're using the latest version (v${localVersion})`);
 					}
