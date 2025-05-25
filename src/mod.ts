@@ -9,6 +9,8 @@ import { MongoID } from "@spt/models/enums/MongoID";
 import { CustomItemService } from "@spt/services/mod/CustomItemService";
 import { NewItemFromCloneDetails } from "@spt/models/spt/mod/NewItemDetails";
 
+import * as https from "https";
+
 import * as path from "path";
 const fs = require('fs');
 const modPath = path.normalize(path.join(__dirname, '..'));
@@ -36,6 +38,54 @@ class ConsumablesGalore implements IPostDBLoadMod
 
 		//Custom item server to create new items.
 		const customItem = container.resolve<CustomItemService>( "CustomItemService" );
+
+		// Check GitHub for latest release
+		function checkForUpdates(localVersion: string, logger: Ilogger): void {
+			const options = {
+				hostname: 'api.github.com',
+				path: '/repos/AlmightyTank/ConsumablesGalore/releases/latest',
+				method: 'GET',
+				headers: {
+					'User-Agent': 'SPT-AKI-Mod',
+					'Accept': 'application/vnd.github.v3+json'
+				}
+			};
+
+			const req = https.request(options, (res) => {
+				let data = '';
+
+				res.on('data', (chunk) => {
+					data += chunk;
+				});
+
+			res.on('end', () => {
+				try {
+					const release = JSON.parse(data);
+					// Get only version after last dash (e.g., v3.11-1.4.2 → 1.4.2)
+					const tag = release.tag_name;
+					const latestVersion = tag.includes("-") ? tag.split("-").pop() : tag.replace(/^v/, "");
+
+					if (latestVersion !== localVersion) {
+						logger.warning(`[Consumables Galore] New version available: v${latestVersion}. You're using v${localVersion}. Visit: ${release.html_url}`);
+					} else {
+						logger.info(`[Consumables Galore] You're using the latest version (v${localVersion})`);
+					}
+				} catch (err) {
+					logger.error(`[Consumables Galore] Could not parse GitHub release info: ${err}`);
+				}
+			});
+
+			});
+
+			req.on('error', (err) => {
+				logger.error(`[Consumables Galore] Failed to check for updates: ${err}`);
+			});
+
+			req.end();
+		}
+
+		const packageData = JSON.parse(fs.readFileSync(`${modPath}/package.json`, 'utf-8'));
+		checkForUpdates(packageData.version, logger);
 
 
 		// Get tables from database
